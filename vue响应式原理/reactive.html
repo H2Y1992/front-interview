@@ -6,7 +6,68 @@
     <title>Document</title>
 </head>
 <body>
-    <script> 
+    <script>
+
+        function defineReactive(obj, key, value) {
+            
+            if (value instanceof Object && value !== null) {
+                observer(value)
+            }
+            Object.defineProperty(obj, key, {
+                get(){
+                    console.log('获取属性')
+                    return value
+                },
+                set(newVal) {
+                    console.log('设置属性', newVal)
+                    value = newVal
+                }
+            })
+        }
+
+        function observerArray(value) {
+            // console.log(value)
+            // let arrayMethods = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse']
+    
+            // let oldArrayProto = Array.prototype
+
+            // let methods = Object.create(oldArrayProto)
+            
+            // arrayMethods.forEach(method => {
+            //     value.__proto__[method] = function() {
+            //         console.log('拦截数组方法')
+            //         oldArrayProto[method].apply(this, arguments)
+            //     }
+            // })
+        }
+
+        function observer(obj) {
+            for(let key in obj) {
+                let value = obj[key]
+                if (value instanceof Array) {
+                    observerArray(value)
+                } else {
+                    defineReactive(obj, key, value)
+                }
+            }
+        }
+
+
+        let obj = {
+            a: 1,
+            b: '2',
+            c: [3,4, {g: 8}],
+            d: {
+                e: 5,
+                f: [6,7]
+            },
+            h: null
+        }
+
+        observer(obj)
+        obj.a
+        obj.a = 1
+        console.log(obj)
     </script>
 </body>
 </html>
