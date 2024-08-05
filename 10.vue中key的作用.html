@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <!-- 
+      key的作用是给每个节点一个唯一标识,不添加key，input的切换不会触发重新渲染
+      之前在解决同一个组件复用时包括keep-alive，会出现组件页面不刷新，可以使用key的方式解决
+    -->
+    <input type="text" name="" id="" v-if="inputType" key="a">
+    <input type="password" name="" id="" v-else key="b">
+    <button @click="inputType = !inputType">切换类型</button>
+    <div>
+      key主要用在Vue的虚拟DOM算法中，在新旧nodes对比时辨识VNodes
+      如果不使用key，Vue会使用一种最大限度减少动态元素并且尽可能的尝试【就地】修改/复用相同类型元素的算法
+    </div>
+
+    <ul>
+      <!-- <li v-for="(item, index) in friuts" :key="index"> -->
+      <li v-for="(item, index) in friuts" :key="item.id">
+        <input type="checkbox">
+        {{item.name}}
+      </li>
+    </ul>
+    <button @click="addFriut">添加水果</button>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        inputType: true,
+        friuts: [
+          {
+            name: '苹果',
+            id: 1
+          },
+          {
+            name: '香蕉',
+            id: 2
+          }
+        ]
+      },
+      methods: {
+        addFriut() {
+          this.friuts.unshift({
+            name: '西瓜',
+            id: 3
+          })
+        }
+      },
+    })
+  </script>
+</body>
+</html>

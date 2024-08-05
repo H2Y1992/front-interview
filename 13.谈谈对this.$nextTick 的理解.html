@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <p>
+      {{msg}}
+    </p>
+    https://v2.cn.vuejs.org/v2/guide/reactivity.html#%E5%BC%82%E6%AD%A5%E6%9B%B4%E6%96%B0%E9%98%9F%E5%88%97
+
+    vue是数据同步更改，视图异步更新！！，这个机制一定要记住
+    
+    vue在更新dom时是【异步更新】的，只要侦测到数据变化，vue将开启一个队列，
+    并缓冲到同一事件循环（这指的是javascript的执行环境中事件循环机制）中发生的所有数据变更，
+    如果同一个watcher被多次触发，只会被推入一次队列，
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+
+    // 事件循环
+    // 1. 同步任务执行完成：当执行栈中的所有同步任务执行完毕时，浏览器会检查是否有微任务需要执行。
+    // 2. 微任务处理：微任务是在当前任务执行结束后立即执行的任务，如Promise回调函数。一旦当前事件循环中的所有同步任务执行完毕，浏览器会立即执行微任务队列中的所有微任务。
+    // 3. 更新渲染：如果需要更新UI（例如DOM操作），浏览器会在事件循环的某个时刻执行重新渲染操作。
+    // 4. 执行宏任务，它会将宏任务的回调函数推入宏任务队列，等待下一个事件循环。常见的宏任务包括setTimeout、setInterval、事件处理器等。
+    // 5. 宏任务执行：在当前事件循环中，宏任务队列中的任务会在微任务执行完毕后依次执行。
+
+
+    new Vue({
+      el: '#app',
+      data: {
+        msg: 'hello'
+      },
+      // vue2 出现下面逻辑的原因是vue内部 会将数据变更放入队列，然后异步更新dom
+      // 我们代码中的数据变更触发视图变化也是通过源码中的nextTick方法，而我们代码中使用nextTick后，会将两个队列放入一个数组中
+      // flush刷新页面的队列中，会先执行，然后执行nextTick回调Fn
+
+      // this.msg = 'world'的数据变更后
+      // 会把this.msg = 'world'  console.log(this.$el.innerHTML)等代码放到flush刷新页面的队列中，
+      // 然后再处理this.$nextTick内的回调 也会将数据变更放入队列中
+
+      // [flush刷新页面, nextTick回调Fn]  按照顺序执行
+      async mounted() {
+        this.msg = 'world'
+        console.log(this.$el.innerHTML) // hello
+        this.$nextTick(() => {
+          console.log(this.$el.innerHTML) // world
+        })
+        console.log(this.$el.innerHTML) // hello
+      }
+    })
+  </script>
+</body>
+</html>

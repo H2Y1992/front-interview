@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    {{fullName}}
+  </div>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script>
+    const {createApp, ref, computed, reactive} = Vue
+
+    createApp({
+      setup() {
+        const firstName = ref('zhang')
+        const lastName = ref('san')
+
+        const fullName = computed(() => {
+          return firstName.value + '-' + lastName.value
+        })
+        return {
+          fullName
+        }
+      }
+    }).mount('#app')
+  </script>
+</body>
+</html>

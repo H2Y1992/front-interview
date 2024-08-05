@@ -9,10 +9,10 @@
     <script>
 
         function defineReactive(obj, key, value) {
-            
-            if (value instanceof Object && value !== null) {
+            if(value instanceof Object && value !== null) {
                 observer(value)
             }
+
             Object.defineProperty(obj, key, {
                 get(){
                     console.log('获取属性')
@@ -25,29 +25,36 @@
             })
         }
 
-        function observerArray(value) {
-            // console.log(value)
-            // let arrayMethods = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse']
-    
-            // let oldArrayProto = Array.prototype
+        function observerArray(arrayVal) {
+            let originalArrayProto = Array.prototype
+            let newArrayProto = Object.create(originalArrayProto)
 
-            // let methods = Object.create(oldArrayProto)
+            arrayVal.__proto__ = newArrayProto // 数组调用方法时，原型dispatcher会拦截
+
+            let arrayMethods = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse']
             
-            // arrayMethods.forEach(method => {
-            //     value.__proto__[method] = function() {
-            //         console.log('拦截数组方法')
-            //         oldArrayProto[method].apply(this, arguments)
-            //     }
-            // })
+            arrayMethods.forEach(method => {
+                newArrayProto[method] = function() {
+                    console.log('拦截数组')
+                    console.log(this)
+                    // originalArrayProto[method].call(this, ...arguments)
+                    originalArrayProto[method].call(this,...arguments)
+                }
+            })
+
+            arrayVal.forEach(item => {
+                if(item instanceof Object && item !== null) {
+                    observer(item)
+                }
+            })
         }
 
         function observer(obj) {
-            for(let key in obj) {
-                let value = obj[key]
-                if (value instanceof Array) {
-                    observerArray(value)
-                } else {
-                    defineReactive(obj, key, value)
+            if(Array.isArray(obj)) {
+                observerArray(obj)
+            } else {
+                for(let key in obj) {
+                    defineReactive(obj, key, obj[key])
                 }
             }
         }
@@ -56,7 +63,7 @@
         let obj = {
             a: 1,
             b: '2',
-            c: [3,4, {g: 8}],
+            c: [3,4, {g: 8}, [9,10]],
             d: {
                 e: 5,
                 f: [6,7]
